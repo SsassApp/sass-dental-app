@@ -23,6 +23,7 @@ export default function Dashboard() {
   });
   
 const [entries, setEntries] = useState([]);
+  const [date, setDate] = useState("");
   
   const handleChange = (field, value) => {
     setData({ ...data, [field]: value });
@@ -39,19 +40,21 @@ const [entries, setEntries] = useState([]);
   };
 
   const saveData = async () => {
-    await addDoc(collection(db, "entries"), {
-      ...data,
-      createdAt: new Date(),
-      user: user.email,
-    });
-    alert("Saved!");
-  };
+  await addDoc(collection(db, "entries"), {
+  ...data,
+  date: date,
+  createdAt: new Date(),
+  user: user.email,
+});
 
-  const loadData = async () => {
+ const loadData = async () => {
   const querySnapshot = await getDocs(collection(db, "entries"));
   const list = [];
   querySnapshot.forEach((doc) => {
-    list.push(doc.data());
+    const entry = doc.data();
+    if (entry.date === date) {
+      list.push(entry);
+    }
   });
   setEntries(list);
 };
@@ -79,6 +82,11 @@ const [entries, setEntries] = useState([]);
   return (
     <main style={{ padding: 20 }}>
       <h1>SaaS Dental Dashboard</h1>
+    <input
+  type="date"
+  value={date}
+  onChange={(e) => setDate(e.target.value)}
+/>
 
       <div style={{ display: "grid", gap: 10, maxWidth: 400 }}>
         {Object.keys(data).map((field) => (
@@ -102,7 +110,8 @@ const [entries, setEntries] = useState([]);
       <h2>Saved Entries</h2>
 {entries.map((entry, i) => (
   <div key={i} style={{ marginBottom: 10 }}>
-    <p>Production: {entry.production}</p>
+    <p>Date: {entry.date}</p>
+<p>Production: {entry.production}</p>
     <p>Collections: {entry.collections}</p>
     <hr />
   </div>
