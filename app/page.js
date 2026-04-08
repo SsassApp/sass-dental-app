@@ -78,6 +78,24 @@ date: date,
     }
   });
 
+const loadData = async () => {
+  const querySnapshot = await getDocs(collection(db, "entries"));
+  const list = [];
+
+  querySnapshot.forEach((doc) => {
+    const entry = doc.data();
+    if (entry.date === date && entry.practiceId === practiceId) {
+      list.push(entry);
+    }
+  });
+
+  setEntries(list);
+
+  if (list.length > 0 && list[0].goals) {
+    setGoals(list[0].goals);
+  }
+};
+
 const loadPractices = async () => {
   const querySnapshot = await getDocs(collection(db, "practices"));
 
