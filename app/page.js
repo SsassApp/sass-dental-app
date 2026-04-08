@@ -1,7 +1,14 @@
 "use client";
 import { useState } from "react";
+import { auth, db } from "../lib/firebase";
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
+import { addDoc, collection } from "firebase/firestore";
 
 export default function Dashboard() {
+  const [user, setUser] = useState(null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
   const [data, setData] = useState({
     newPatients: "",
     calls: "",
@@ -19,6 +26,36 @@ export default function Dashboard() {
     setData({ ...data, [field]: value });
   };
 
+  const login = async () => {
+    try {
+      const res = await signInWithEmailAndPassword(auth, email, password);
+      setUser(res.user);
+    } catch {
+      const res = await createUserWithEmailAndPassword(auth, email, password);
+      setUser(res.user);
+    }
+  };
+
+  const saveData = async () => {
+    await addDoc(collection(db, "entries"), {
+      ...data,
+      createdAt: new Date(),
+      user: user.email,
+    });
+    alert("Saved!");
+  };
+
+  if (!user) {
+    return (
+      <main style={{ padding: 20 }}>
+        <h1>Login</h1>
+        <input placeholder="Email" onChange={(e) => setEmail(e.target.value)} />
+        <input placeholder="Password" type="password" onChange={(e) => setPassword(e.target.value)} />
+        <button onClick={login}>Login / Sign Up</button>
+      </main>
+    );
+  }
+
   const production = Number(data.production) || 0;
   const collections = Number(data.collections) || 0;
   const adjustments = Number(data.adjustments) || 0;
@@ -27,14 +64,10 @@ export default function Dashboard() {
   const netProduction = production - adjustments;
   const collectionRate = production ? (collections / production) * 100 : 0;
   const productionVsGoal = goal ? (production / goal) * 100 : 0;
-  const showRate =
-    data.scheduled && data.kept
-      ? (data.kept / data.scheduled) * 100
-      : 0;
 
   return (
     <main style={{ padding: 20 }}>
-      <h1>SaaS Dental Owner Manager Reporting</h1>
+      <h1>SaaS Dental Dashboard</h1>
 
       <div style={{ display: "grid", gap: 10, maxWidth: 400 }}>
         {Object.keys(data).map((field) => (
@@ -47,11 +80,12 @@ export default function Dashboard() {
         ))}
       </div>
 
+      <button onClick={saveData}>Save Data</button>
+
       <h2>KPIs</h2>
       <p>Net Production: ${netProduction}</p>
       <p>Collection Rate: {collectionRate.toFixed(1)}%</p>
       <p>Production vs Goal: {productionVsGoal.toFixed(1)}%</p>
-      <p>Show Rate: {showRate.toFixed(1)}%</p>
     </main>
   );
 }
