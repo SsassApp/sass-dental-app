@@ -78,12 +78,6 @@ date: date,
     }
   });
 
-  setEntries(list);
-
-  if (list.length > 0 && list[0].goals) {
-    setGoals(list[0].goals);
-  }
-};
 const loadPractices = async () => {
   const querySnapshot = await getDocs(collection(db, "practices"));
 
