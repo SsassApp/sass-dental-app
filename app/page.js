@@ -157,35 +157,61 @@ const getColor = (value, good, ok) => {
   if (value >= ok) return "orange";
   return "red";
 };
-   
+ const cardStyle = {
+  background: "#fff",
+  padding: 20,
+  borderRadius: 12,
+  boxShadow: "0 4px 12px rgba(0,0,0,0.05)"
+};  
 return (
-    <main style={{ padding: 20 }}>
-      <h1>SaaS Dental Dashboard</h1>
-  <h2>Practice</h2>
+    <main style={{
+  padding: 30,
+  background: "#f5f7fb",
+  minHeight: "100vh",
+  fontFamily: "sans-serif"
+}}>
+      <h1 style={{ marginBottom: 20 }}>Sass Dental Dashboard</h1>
+ <div style={cardStyle}>
+  <h3>Practice</h3>
 
-<select
-  value={practiceId}
-  onChange={(e) => setPracticeId(e.target.value)}
->
-  {practices.map((p, i) => (
-    <option key={i} value={p}>
-      {p}
-    </option>
-  ))}
-</select>
+  <select
+    value={practiceId}
+    onChange={(e) => setPracticeId(e.target.value)}
+    style={{
+      padding: 8,
+      borderRadius: 6,
+      border: "1px solid #ddd",
+      marginRight: 10
+    }}
+  >
+    {practices.map((p, i) => (
+      <option key={i} value={p}>
+        {p}
+      </option>
+    ))}
+  </select>
 
-<button
-  onClick={async () => {
-    const name = prompt("New practice name:");
-    if (name) {
-      const updated = [...practices, name];
-      setPractices(updated);
-      await savePractices(updated);
-    }
-  }}
->
-  + Add Practice
+  <button
+    onClick={async () => {
+      const name = prompt("New practice name:");
+      if (name) {
+        const updated = [...practices, name];
+        setPractices(updated);
+        await savePractices(updated);
+      }
+    }}
+    style={{
+      padding: "8px 12px",
+      borderRadius: 6,
+      border: "none",
+      background: "#4f46e5",
+      color: "white",
+      cursor: "pointer"
+    }}
+  >
+   + Add Practice
 </button>
+</div>
   <h2>Goals</h2>
 
 <div style={{ border: "1px solid #ccc", padding: 10, borderRadius: 10 }}>
@@ -211,47 +237,54 @@ return (
   />
 </div>
     <h2>Daily Summary</h2>
-      <h2>Production Trend</h2>
+     <div style={{ ...cardStyle, marginTop: 20 }}>
+  <h3>Production Trend</h3>
 
-<LineChart width={400} height={250} data={chartData}>
-  <CartesianGrid strokeDasharray="3 3" />
-  <XAxis dataKey="date" />
-  <YAxis />
-  <Tooltip />
-  <Line type="monotone" dataKey="production" />
-  <Line type="monotone" dataKey="collections" />
-</LineChart>
+  <LineChart width={500} height={300} data={chartData}>
+    <CartesianGrid stroke="#eee" />
+    <XAxis dataKey="date" />
+    <YAxis />
+    <Tooltip />
+    <Line type="monotone" dataKey="production" stroke="#4f46e5" strokeWidth={3} />
+    <Line type="monotone" dataKey="collections" stroke="#10b981" strokeWidth={3} />
+  </LineChart>
+</div>
 
-<div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10, maxWidth: 400 }}>
-  <div style={{ border: "1px solid #ccc", padding: 10 }}>
+<div style={{
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
+  gap: 15,
+  marginTop: 20
+}}>
+  <div style={{ ...cardStyle, textAlign: "center" }}>
     <strong>Production vs Goal</strong>
     <p style={{ color: getColor(productionVsGoalSummary, 100, 80) }}>
   {productionVsGoalSummary.toFixed(1)}%
 </p>
   </div>
 
-  <div style={{ border: "1px solid #ccc", padding: 10, borderRadius: 10 }}>
+  <div style={{ ...cardStyle, textAlign: "center" }}>
     <strong>Collection Rate</strong>
     <p style={{ color: getColor(collectionRateSummary, 98, 90) }}>
   {collectionRateSummary.toFixed(1)}%
 </p>
   </div>
 
-  <div style={{ border: "1px solid #ccc", padding: 10, borderRadius: 10 }}>
+  <div style={{ ...cardStyle, textAlign: "center" }}>
     <strong>New Patients</strong>
     <p style={{ color: getColor(totalNewPatients, goals.newPatients, goals.newPatients * 0.5)}}>
   {totalNewPatients}
 </p>
   </div>
 
-  <div style={{ border: "1px solid #ccc", padding: 10, borderRadius: 10 }}>
+  <div style={{ ...cardStyle, textAlign: "center" }}>
     <strong>Show Rate</strong>
     <p style={{ color: getColor(showRateSummary, goals.showRate, goals.showRate * 0.8)}}>
   {showRateSummary.toFixed(1)}%
 </p>
   </div>
 
-  <div style={{ border: "1px solid #ccc", padding: 10, borderRadius: 10 }}>
+  <div style={{ ...cardStyle, textAlign: "center" }}>
     <strong>Same Day Tx</strong>
     <p style={{ color: getColor(sameDayRateSummary, goals.sameDay, goals.sameDay * 0.5)}}>
   {sameDayRateSummary.toFixed(1)}%
