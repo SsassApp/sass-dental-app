@@ -55,28 +55,18 @@ const savePractices = async (newList) => {
     list: newList,
   });
 };
-  const saveData = async () => {
+
+const saveData = async () => {
   await addDoc(collection(db, "entries"), {
     ...data,
-goals,
-practiceId,   
-date: date,
+    goals,
+    practiceId,
+    date: date,
     createdAt: new Date(),
     user: user.email,
   });
   alert("Saved!");
 };
-
-  const loadData = async () => {
-  const querySnapshot = await getDocs(collection(db, "entries"));
-  const list = [];
-
-  querySnapshot.forEach((doc) => {
-    const entry = doc.data();
-    if (entry.date === date && entry.practiceId === practiceId) {
-      list.push(entry);
-    }
-  });
 
 const loadData = async () => {
   const querySnapshot = await getDocs(collection(db, "entries"));
@@ -96,7 +86,7 @@ const loadData = async () => {
   }
 };
 
-const loadPractices = async () => {
+  const loadPractices = async () => {
   const querySnapshot = await getDocs(collection(db, "practices"));
 
   querySnapshot.forEach((docSnap) => {
@@ -107,10 +97,6 @@ const loadPractices = async () => {
   });
 };
   
-  setEntries(list);if (list.length > 0 && list[0].goals) {
-  setGoals(list[0].goals);
-}
-};
   useEffect(() => {
   if (date) {
     loadData();
