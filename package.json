@@ -1,6 +1,16 @@
-"dependencies": {
-  "next": "latest",
-  "react": "latest",
-  "react-dom": "latest",
-  "firebase": "^10.0.0"
+{
+  "name": "sass-dental-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "firebase": "^10.0.0"
+  }
 }
