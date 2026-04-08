@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { auth, db } from "../lib/firebase";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
-import { addDoc, collection, getDocs } from "firebase/firestore";
+import { addDoc, collection, getDocs, setDoc, doc } from "firebase/firestore";
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
@@ -49,7 +49,12 @@ const [goals, setGoals] = useState({
       setUser(res.user);
     }
   };
-
+const savePractices = async (newList) => {
+  await setDoc(doc(db, "practices", user.email), {
+    user: user.email,
+    list: newList,
+  });
+};
   const saveData = async () => {
   await addDoc(collection(db, "entries"), {
     ...data,
@@ -80,6 +85,11 @@ const loadData = async () => {
     loadData();
   }
 }, [date, practiceId]);
+  useEffect(() => {
+  if (user) {
+    loadPractices();
+  }
+}, [user]);
   
   if (!user) {
     return (
@@ -133,11 +143,24 @@ return (
 </select>
 
 <button
-  onClick={() => {
+  onClick={async () => {
     const name = prompt("New practice name:");
-    if (name) setPractices([...practices, name]);
+    if (name) {
+      const updated = [...practices, name];
+      setPractices(updated);
+      await savePractices(updated);
+    }
   }}
 >
+    const loadPractices = async () => {
+  const querySnapshot = await getDocs(collection(db, "practices"));
+  querySnapshot.forEach((docSnap) => {
+    const data = docSnap.data();
+    if (data.user === user.email) {
+      setPractices(data.list);
+    }
+  });
+};
   + Add Practice
 </button>
   <h2>Goals</h2>
