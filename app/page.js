@@ -24,6 +24,12 @@ export default function Dashboard() {
   
 const [entries, setEntries] = useState([]);
   const [date, setDate] = useState("");
+const [goals, setGoals] = useState({
+  production: 12000,
+  newPatients: 10,
+  showRate: 90,
+  sameDay: 30,
+});
   
   const handleChange = (field, value) => {
     setData({ ...data, [field]: value });
@@ -42,7 +48,8 @@ const [entries, setEntries] = useState([]);
   const saveData = async () => {
   await addDoc(collection(db, "entries"), {
     ...data,
-    date: date,
+goals,
+date: date,
     createdAt: new Date(),
     user: user.email,
   });
@@ -58,7 +65,9 @@ const loadData = async () => {
       list.push(entry);
     }
   });
-  setEntries(list);
+  setEntries(list);if (list.length > 0 && list[0].goals) {
+  setGoals(list[0].goals);
+}
 };
   useEffect(() => {
   if (date) {
@@ -80,7 +89,7 @@ const loadData = async () => {
   const production = Number(data.production) || 0;
   const collections = Number(data.collections) || 0;
   const adjustments = Number(data.adjustments) || 0;
-  const goal = 12000;
+  const goal = Number(goals.production) || 0;
 
   const netProduction = production - adjustments;
   const collectionRate = production ? (collections / production) * 100 : 0;
@@ -104,12 +113,36 @@ const sameDayRateSummary = totalProduction ? (totalSameDay / totalProduction) * 
 return (
     <main style={{ padding: 20 }}>
       <h1>SaaS Dental Dashboard</h1>
+  <h2>Goals</h2>
+
+<div style={{ border: "1px solid #ccc", padding: 10, borderRadius: 10 }}>
+  <input
+    placeholder="Production Goal"
+    value={goals.production}
+    onChange={(e) => setGoals({ ...goals, production: e.target.value })}
+  />
+  <input
+    placeholder="New Patients Goal"
+    value={goals.newPatients}
+    onChange={(e) => setGoals({ ...goals, newPatients: e.target.value })}
+  />
+  <input
+    placeholder="Show Rate Goal (%)"
+    value={goals.showRate}
+    onChange={(e) => setGoals({ ...goals, showRate: e.target.value })}
+  />
+  <input
+    placeholder="Same Day Tx Goal (%)"
+    value={goals.sameDay}
+    onChange={(e) => setGoals({ ...goals, sameDay: e.target.value })}
+  />
+</div>
     <h2>Daily Summary</h2>
 
 <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10, maxWidth: 400 }}>
   <div style={{ border: "1px solid #ccc", padding: 10 }}>
     <strong>Production vs Goal</strong>
-    <p style={{ color: getColor(productionVsGoalSummary, 90, 70) }}>
+    <p style={{ color: getColor(productionVsGoalSummary, 100, 80) }}>
   {productionVsGoalSummary.toFixed(1)}%
 </p>
   </div>
@@ -123,21 +156,21 @@ return (
 
   <div style={{ border: "1px solid #ccc", padding: 10, borderRadius: 10 }}>
     <strong>New Patients</strong>
-    <p style={{ color: getColor(totalNewPatients, 10, 5) }}>
+    <p style={{ color: getColor(totalNewPatients, goals.newPatients, goals.newPatients * 0.5)}}>
   {totalNewPatients}
 </p>
   </div>
 
   <div style={{ border: "1px solid #ccc", padding: 10, borderRadius: 10 }}>
     <strong>Show Rate</strong>
-    <p style={{ color: getColor(showRateSummary, 90, 75) }}>
+    <p style={{ color: getColor(showRateSummary, goals.showRate, goals.showRate * 0.8)}}>
   {showRateSummary.toFixed(1)}%
 </p>
   </div>
 
   <div style={{ border: "1px solid #ccc", padding: 10, borderRadius: 10 }}>
     <strong>Same Day Tx</strong>
-    <p style={{ color: getColor(sameDayRateSummary, 30, 15) }}>
+    <p style={{ color: getColor(sameDayRateSummary, goals.sameDay, goals.sameDay * 0.5)}}>
   {sameDayRateSummary.toFixed(1)}%
 </p>
   </div>
