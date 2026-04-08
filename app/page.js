@@ -67,15 +67,34 @@ date: date,
   alert("Saved!");
 };
 
-const loadData = async () => {
+  const loadData = async () => {
   const querySnapshot = await getDocs(collection(db, "entries"));
   const list = [];
+
   querySnapshot.forEach((doc) => {
     const entry = doc.data();
-    if (entry.date === date && entry.practiceId === practiceId){
+    if (entry.date === date && entry.practiceId === practiceId) {
       list.push(entry);
     }
   });
+
+  setEntries(list);
+
+  if (list.length > 0 && list[0].goals) {
+    setGoals(list[0].goals);
+  }
+};
+const loadPractices = async () => {
+  const querySnapshot = await getDocs(collection(db, "practices"));
+
+  querySnapshot.forEach((docSnap) => {
+    const data = docSnap.data();
+    if (data.user === user.email) {
+      setPractices(data.list);
+    }
+  });
+};
+  
   setEntries(list);if (list.length > 0 && list[0].goals) {
   setGoals(list[0].goals);
 }
@@ -152,15 +171,6 @@ return (
     }
   }}
 >
-    const loadPractices = async () => {
-  const querySnapshot = await getDocs(collection(db, "practices"));
-  querySnapshot.forEach((docSnap) => {
-    const data = docSnap.data();
-    if (data.user === user.email) {
-      setPractices(data.list);
-    }
-  });
-};
   + Add Practice
 </button>
   <h2>Goals</h2>
