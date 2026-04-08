@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { auth, db } from "../lib/firebase";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
-import { addDoc, collection } from "firebase/firestore";
+import { addDoc, collection, getDocs } from "firebase/firestore";
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
@@ -21,7 +21,9 @@ export default function Dashboard() {
     reviews: "",
     referrals: "",
   });
-
+  
+const [entries, setEntries] = useState([]);
+  
   const handleChange = (field, value) => {
     setData({ ...data, [field]: value });
   };
@@ -45,6 +47,15 @@ export default function Dashboard() {
     alert("Saved!");
   };
 
+  const loadData = async () => {
+  const querySnapshot = await getDocs(collection(db, "entries"));
+  const list = [];
+  querySnapshot.forEach((doc) => {
+    list.push(doc.data());
+  });
+  setEntries(list);
+};
+  
   if (!user) {
     return (
       <main style={{ padding: 20 }}>
@@ -81,11 +92,28 @@ export default function Dashboard() {
       </div>
 
       <button onClick={saveData}>Save Data</button>
+      <button onClick={loadData}>Load Data</button>
 
       <h2>KPIs</h2>
       <p>Net Production: ${netProduction}</p>
       <p>Collection Rate: {collectionRate.toFixed(1)}%</p>
       <p>Production vs Goal: {productionVsGoal.toFixed(1)}%</p>
+
+      <h2>Saved Entries</h2>
+{entries.map((entry, i) => (
+  <div key={i} style={{ marginBottom: 10 }}>
+    <p>Production: {entry.production}</p>
+    <p>Collections: {entry.collections}</p>
+    <hr />
+  </div>
+))}<h2>Saved Entries</h2>
+{entries.map((entry, i) => (
+  <div key={i} style={{ marginBottom: 10 }}>
+    <p>Production: {entry.production}</p>
+    <p>Collections: {entry.collections}</p>
+    <hr />
+  </div>
+))}
     </main>
   );
 }
