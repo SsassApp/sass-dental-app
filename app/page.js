@@ -106,14 +106,8 @@ const [entries, setEntries] = useState([]);
     <p>Collections: {entry.collections}</p>
     <hr />
   </div>
-))}<h2>Saved Entries</h2>
-{entries.map((entry, i) => (
-  <div key={i} style={{ marginBottom: 10 }}>
-    <p>Production: {entry.production}</p>
-    <p>Collections: {entry.collections}</p>
-    <hr />
-  </div>
 ))}
+
     </main>
   );
 }
