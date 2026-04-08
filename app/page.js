@@ -41,13 +41,15 @@ const [entries, setEntries] = useState([]);
 
   const saveData = async () => {
   await addDoc(collection(db, "entries"), {
-  ...data,
-  date: date,
-  createdAt: new Date(),
-  user: user.email,
-});
+    ...data,
+    date: date,
+    createdAt: new Date(),
+    user: user.email,
+  });
+  alert("Saved!");
+};
 
- const loadData = async () => {
+const loadData = async () => {
   const querySnapshot = await getDocs(collection(db, "entries"));
   const list = [];
   querySnapshot.forEach((doc) => {
