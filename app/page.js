@@ -96,7 +96,12 @@ const productionVsGoalSummary = goal ? (totalProduction / goal) * 100 : 0;
 const collectionRateSummary = totalProduction ? (totalCollections / totalProduction) * 100 : 0;
 const showRateSummary = totalScheduled ? (totalKept / totalScheduled) * 100 : 0;
 const sameDayRateSummary = totalProduction ? (totalSameDay / totalProduction) * 100 : 0;
-  return (
+ const getColor = (value, good, ok) => {
+  if (value >= good) return "green";
+  if (value >= ok) return "orange";
+  return "red";
+}; 
+return (
     <main style={{ padding: 20 }}>
       <h1>SaaS Dental Dashboard</h1>
     <h2>Daily Summary</h2>
@@ -104,27 +109,37 @@ const sameDayRateSummary = totalProduction ? (totalSameDay / totalProduction) * 
 <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10, maxWidth: 400 }}>
   <div style={{ border: "1px solid #ccc", padding: 10 }}>
     <strong>Production vs Goal</strong>
-    <p>{productionVsGoalSummary.toFixed(1)}%</p>
+    <p style={{ color: getColor(productionVsGoalSummary, 90, 70) }}>
+  {productionVsGoalSummary.toFixed(1)}%
+</p>
   </div>
 
-  <div style={{ border: "1px solid #ccc", padding: 10 }}>
+  <div style={{ border: "1px solid #ccc", padding: 10, borderRadius: 10 }}>
     <strong>Collection Rate</strong>
-    <p>{collectionRateSummary.toFixed(1)}%</p>
+    <p style={{ color: getColor(collectionRateSummary, 98, 90) }}>
+  {collectionRateSummary.toFixed(1)}%
+</p>
   </div>
 
-  <div style={{ border: "1px solid #ccc", padding: 10 }}>
+  <div style={{ border: "1px solid #ccc", padding: 10, borderRadius: 10 }}>
     <strong>New Patients</strong>
-    <p>{totalNewPatients}</p>
+    <p style={{ color: getColor(totalNewPatients, 10, 5) }}>
+  {totalNewPatients}
+</p>
   </div>
 
-  <div style={{ border: "1px solid #ccc", padding: 10 }}>
+  <div style={{ border: "1px solid #ccc", padding: 10, borderRadius: 10 }}>
     <strong>Show Rate</strong>
-    <p>{showRateSummary.toFixed(1)}%</p>
+    <p style={{ color: getColor(showRateSummary, 90, 75) }}>
+  {showRateSummary.toFixed(1)}%
+</p>
   </div>
 
-  <div style={{ border: "1px solid #ccc", padding: 10 }}>
+  <div style={{ border: "1px solid #ccc", padding: 10, borderRadius: 10 }}>
     <strong>Same Day Tx</strong>
-    <p>{sameDayRateSummary.toFixed(1)}%</p>
+    <p style={{ color: getColor(sameDayRateSummary, 30, 15) }}>
+  {sameDayRateSummary.toFixed(1)}%
+</p>
   </div>
 </div>
     <input
