@@ -85,10 +85,48 @@ const loadData = async () => {
   const netProduction = production - adjustments;
   const collectionRate = production ? (collections / production) * 100 : 0;
   const productionVsGoal = goal ? (production / goal) * 100 : 0;
+const totalProduction = entries.reduce((sum, e) => sum + Number(e.production || 0), 0);
+const totalCollections = entries.reduce((sum, e) => sum + Number(e.collections || 0), 0);
+const totalNewPatients = entries.reduce((sum, e) => sum + Number(e.newPatients || 0), 0);
+const totalScheduled = entries.reduce((sum, e) => sum + Number(e.scheduled || 0), 0);
+const totalKept = entries.reduce((sum, e) => sum + Number(e.kept || 0), 0);
+const totalSameDay = entries.reduce((sum, e) => sum + Number(e.sameDayTreatment || 0), 0);
 
+const productionVsGoalSummary = goal ? (totalProduction / goal) * 100 : 0;
+const collectionRateSummary = totalProduction ? (totalCollections / totalProduction) * 100 : 0;
+const showRateSummary = totalScheduled ? (totalKept / totalScheduled) * 100 : 0;
+const sameDayRateSummary = totalProduction ? (totalSameDay / totalProduction) * 100 : 0;
   return (
     <main style={{ padding: 20 }}>
       <h1>SaaS Dental Dashboard</h1>
+    <h2>Daily Summary</h2>
+
+<div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10, maxWidth: 400 }}>
+  <div style={{ border: "1px solid #ccc", padding: 10 }}>
+    <strong>Production vs Goal</strong>
+    <p>{productionVsGoalSummary.toFixed(1)}%</p>
+  </div>
+
+  <div style={{ border: "1px solid #ccc", padding: 10 }}>
+    <strong>Collection Rate</strong>
+    <p>{collectionRateSummary.toFixed(1)}%</p>
+  </div>
+
+  <div style={{ border: "1px solid #ccc", padding: 10 }}>
+    <strong>New Patients</strong>
+    <p>{totalNewPatients}</p>
+  </div>
+
+  <div style={{ border: "1px solid #ccc", padding: 10 }}>
+    <strong>Show Rate</strong>
+    <p>{showRateSummary.toFixed(1)}%</p>
+  </div>
+
+  <div style={{ border: "1px solid #ccc", padding: 10 }}>
+    <strong>Same Day Tx</strong>
+    <p>{sameDayRateSummary.toFixed(1)}%</p>
+  </div>
+</div>
     <input
   type="date"
   value={date}
