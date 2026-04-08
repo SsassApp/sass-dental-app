@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { auth, db } from "../lib/firebase";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { addDoc, collection, getDocs } from "firebase/firestore";
@@ -60,6 +60,11 @@ const loadData = async () => {
   });
   setEntries(list);
 };
+  useEffect(() => {
+  if (date) {
+    loadData();
+  }
+}, [date]);
   
   if (!user) {
     return (
@@ -102,7 +107,6 @@ const loadData = async () => {
       </div>
 
       <button onClick={saveData}>Save Data</button>
-      <button onClick={loadData}>Load Data</button>
 
       <h2>KPIs</h2>
       <p>Net Production: ${netProduction}</p>
@@ -110,14 +114,19 @@ const loadData = async () => {
       <p>Production vs Goal: {productionVsGoal.toFixed(1)}%</p>
 
       <h2>Saved Entries</h2>
-{entries.map((entry, i) => (
-  <div key={i} style={{ marginBottom: 10 }}>
-    <p>Date: {entry.date}</p>
-<p>Production: {entry.production}</p>
-    <p>Collections: {entry.collections}</p>
-    <hr />
-  </div>
-))}
+
+{entries.length === 0 ? (
+  <p>No data for this date</p>
+) : (
+  entries.map((entry, i) => (
+    <div key={i} style={{ marginBottom: 10 }}>
+      <p>Date: {entry.date}</p>
+      <p>Production: {entry.production}</p>
+      <p>Collections: {entry.collections}</p>
+      <hr />
+    </div>
+  ))
+)}
 
     </main>
   );
