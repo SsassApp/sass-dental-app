@@ -146,17 +146,18 @@ const productionVsGoalSummary = goal ? (totalProduction / goal) * 100 : 0;
 const collectionRateSummary = totalProduction ? (totalCollections / totalProduction) * 100 : 0;
 const showRateSummary = totalScheduled ? (totalKept / totalScheduled) * 100 : 0;
 const sameDayRateSummary = totalProduction ? (totalSameDay / totalProduction) * 100 : 0;
- const getColor = (value, good, ok) => {
-   const chartData = entries.map((e) => ({
+ const chartData = entries.map((e) => ({
   date: e.date,
   production: Number(e.production || 0),
   collections: Number(e.collections || 0),
 }));
-   
+
+const getColor = (value, good, ok) => {
   if (value >= good) return "green";
   if (value >= ok) return "orange";
   return "red";
-}; 
+};
+   
 return (
     <main style={{ padding: 20 }}>
       <h1>SaaS Dental Dashboard</h1>
