@@ -24,7 +24,12 @@ export default function Dashboard() {
   
 const [entries, setEntries] = useState([]);
   const [date, setDate] = useState("");
+
+  const [practiceId, setPracticeId] = useState("default");
+  const [practices, setPractices] = useState(["default"]);
+  
 const [goals, setGoals] = useState({
+ 
   production: 12000,
   newPatients: 10,
   showRate: 90,
@@ -49,6 +54,7 @@ const [goals, setGoals] = useState({
   await addDoc(collection(db, "entries"), {
     ...data,
 goals,
+practiceId,   
 date: date,
     createdAt: new Date(),
     user: user.email,
@@ -61,7 +67,7 @@ const loadData = async () => {
   const list = [];
   querySnapshot.forEach((doc) => {
     const entry = doc.data();
-    if (entry.date === date) {
+    if (entry.date === date && entry.practiceId === practiceId){
       list.push(entry);
     }
   });
@@ -73,7 +79,7 @@ const loadData = async () => {
   if (date) {
     loadData();
   }
-}, [date]);
+}, [date, practiceId]);
   
   if (!user) {
     return (
@@ -113,6 +119,27 @@ const sameDayRateSummary = totalProduction ? (totalSameDay / totalProduction) * 
 return (
     <main style={{ padding: 20 }}>
       <h1>SaaS Dental Dashboard</h1>
+  <h2>Practice</h2>
+
+<select
+  value={practiceId}
+  onChange={(e) => setPracticeId(e.target.value)}
+>
+  {practices.map((p, i) => (
+    <option key={i} value={p}>
+      {p}
+    </option>
+  ))}
+</select>
+
+<button
+  onClick={() => {
+    const name = prompt("New practice name:");
+    if (name) setPractices([...practices, name]);
+  }}
+>
+  + Add Practice
+</button>
   <h2>Goals</h2>
 
 <div style={{ border: "1px solid #ccc", padding: 10, borderRadius: 10 }}>
