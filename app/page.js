@@ -3,6 +3,14 @@ import { useState, useEffect } from "react";
 import { auth, db } from "../lib/firebase";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
 import { addDoc, collection, getDocs, setDoc, doc } from "firebase/firestore";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+} from "recharts";
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
@@ -139,6 +147,12 @@ const collectionRateSummary = totalProduction ? (totalCollections / totalProduct
 const showRateSummary = totalScheduled ? (totalKept / totalScheduled) * 100 : 0;
 const sameDayRateSummary = totalProduction ? (totalSameDay / totalProduction) * 100 : 0;
  const getColor = (value, good, ok) => {
+   const chartData = entries.map((e) => ({
+  date: e.date,
+  production: Number(e.production || 0),
+  collections: Number(e.collections || 0),
+}));
+   
   if (value >= good) return "green";
   if (value >= ok) return "orange";
   return "red";
@@ -196,6 +210,16 @@ return (
   />
 </div>
     <h2>Daily Summary</h2>
+      <h2>Production Trend</h2>
+
+<LineChart width={400} height={250} data={chartData}>
+  <CartesianGrid strokeDasharray="3 3" />
+  <XAxis dataKey="date" />
+  <YAxis />
+  <Tooltip />
+  <Line type="monotone" dataKey="production" />
+  <Line type="monotone" dataKey="collections" />
+</LineChart>
 
 <div style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", gap: 10, maxWidth: 400 }}>
   <div style={{ border: "1px solid #ccc", padding: 10 }}>
