@@ -183,6 +183,8 @@ return (
   display: "flex",
   flexDirection: "column"
 }}>
+</div>
+  
 <h2 style={{ marginBottom: 30 }}>🦷 Dental SaaS</h2>
 
 <button style={navItem}>Dashboard</button>
