@@ -157,12 +157,13 @@ const getColor = (value, good, ok) => {
   if (value >= ok) return "orange";
   return "red";
 };
- const cardStyle = {
+const cardStyle = {
   background: "#fff",
   padding: 20,
   borderRadius: 12,
   boxShadow: "0 4px 12px rgba(0,0,0,0.05)"
-};  
+};
+
 const navItem = {
   background: "transparent",
   border: "none",
@@ -171,7 +172,7 @@ const navItem = {
   padding: "10px 0",
   cursor: "pointer",
   fontSize: 14
- };  
+};
 return (
   <div style={{ display: "flex", minHeight: "100vh"}}>
   <div style={{
