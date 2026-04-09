@@ -164,12 +164,39 @@ const getColor = (value, good, ok) => {
   boxShadow: "0 4px 12px rgba(0,0,0,0.05)"
 };  
 return (
-    <main style={{
+  <div style={{ display: "flex", minHeight: "100vh"}}>
+  <div style={{
+  width: 220,
+  background: "#111827",
+  color: "white",
+  padding: 20,
+  display: "flex",
+  flexDirection: "column"
+}}>
+  <h2 style={{ marginBottom: 30 }}>🦷 Dental SaaS</h2>
+const navItem = {
+  background: "transparent",
+  border: "none",
+  color: "white",
+  textAlign: "left",
+  padding: "10px 0",
+  cursor: "pointer",
+  fontSize: 14
+};
+  <button style={navItem}>Dashboard</button>
+  <button style={navItem}>Reports</button>
+  <button style={navItem}>Settings</button>
+
+  <div style={{ marginTop: "auto", fontSize: 12, opacity: 0.6 }}>
+    Logged in as<br />{user.email}</div>
+  </div>
+<div style={{
+  flex: 1,
   padding: 30,
   background: "#f5f7fb",
-  minHeight: "100vh",
   fontFamily: "sans-serif"
 }}>
+
       <h1 style={{ marginBottom: 20 }}>Sass Dental Dashboard</h1>
  <div style={cardStyle}>
   <h3>Practice</h3>
@@ -330,6 +357,23 @@ return (
   ))
 )}
 
-    </main>
   );
+}
+{entries.length === 0 ? (
+  <p>No data for this date</p>
+) : (
+  entries.map((entry, i) => (
+    <div key={i} style={{ marginBottom: 10 }}>
+      <p>Date: {entry.date}</p>
+      <p>Production: {entry.production}</p>
+      <p>Collections: {entry.collections}</p>
+      <hr />
+    </div>
+  ))
+)}
+
+</div> {/* ✅ CLOSE MAIN CONTENT */}
+</div> {/* ✅ CLOSE FLEX LAYOUT */}
+
+);
 }
