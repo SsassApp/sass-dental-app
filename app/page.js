@@ -183,12 +183,11 @@ return (
   display: "flex",
   flexDirection: "column"
 }}>
-  <h2 style={{ marginBottom: 30 }}>🦷 Dental SaaS</h2>
+<h2 style={{ marginBottom: 30 }}>🦷 Dental SaaS</h2>
 
-};
-  <button style={navItem}>Dashboard</button>
-  <button style={navItem}>Reports</button>
-  <button style={navItem}>Settings</button>
+<button style={navItem}>Dashboard</button>
+<button style={navItem}>Reports</button>
+<button style={navItem}>Settings</button>
 
   <div style={{ marginTop: "auto", fontSize: 12, opacity: 0.6 }}>
     Logged in as<br />{user.email}</div>
