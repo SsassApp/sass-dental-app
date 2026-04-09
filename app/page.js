@@ -162,7 +162,7 @@ const cardStyle = {
   padding: 20,
   borderRadius: 12,
   boxShadow: "0 4px 12px rgba(0,0,0,0.05)"
-    
+};  
 const navItem = {
   background: "transparent",
   border: "none",
@@ -174,7 +174,7 @@ const navItem = {
 };
 
 return (
-<<div style={{
+<div style={{
   width: 220,
   background: "#111827",
   color: "white",
