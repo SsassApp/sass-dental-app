@@ -157,7 +157,7 @@ const getColor = (value, good, ok) => {
   if (value >= ok) return "orange";
   return "red";
 };
-const cardStyle = {;
+const cardStyle = {
   background: "#fff",
   padding: 20,
   borderRadius: 12,
