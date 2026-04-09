@@ -361,8 +361,8 @@ return (
   ))
 )}
 
-</div> {/* main content */}
-</div> {/* layout */}
+</div> {/* ✅ CLOSE MAIN CONTENT */}
+</div> {/* ✅ CLOSE FLEX LAYOUT */}
 
 );
 }
