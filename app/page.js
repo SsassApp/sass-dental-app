@@ -163,6 +163,15 @@ const getColor = (value, good, ok) => {
   borderRadius: 12,
   boxShadow: "0 4px 12px rgba(0,0,0,0.05)"
 };  
+const navItem = {
+  background: "transparent",
+  border: "none",
+  color: "white",
+  textAlign: "left",
+  padding: "10px 0",
+  cursor: "pointer",
+  fontSize: 14
+ };  
 return (
   <div style={{ display: "flex", minHeight: "100vh"}}>
   <div style={{
@@ -174,14 +183,7 @@ return (
   flexDirection: "column"
 }}>
   <h2 style={{ marginBottom: 30 }}>🦷 Dental SaaS</h2>
-const navItem = {
-  background: "transparent",
-  border: "none",
-  color: "white",
-  textAlign: "left",
-  padding: "10px 0",
-  cursor: "pointer",
-  fontSize: 14
+
 };
   <button style={navItem}>Dashboard</button>
   <button style={navItem}>Reports</button>
@@ -357,23 +359,8 @@ const navItem = {
   ))
 )}
 
-  );
-}
-{entries.length === 0 ? (
-  <p>No data for this date</p>
-) : (
-  entries.map((entry, i) => (
-    <div key={i} style={{ marginBottom: 10 }}>
-      <p>Date: {entry.date}</p>
-      <p>Production: {entry.production}</p>
-      <p>Collections: {entry.collections}</p>
-      <hr />
-    </div>
-  ))
-)}
-
-</div> {/* ✅ CLOSE MAIN CONTENT */}
-</div> {/* ✅ CLOSE FLEX LAYOUT */}
+</div> {/* main content */}
+</div> {/* layout */}
 
 );
 }
