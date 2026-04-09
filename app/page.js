@@ -118,15 +118,25 @@ export default function Dashboard() {
 
   if (!user) {
     return (
-      <main style={{ padding: 20 }}>
-        <h1>Login</h1>
-        <input placeholder="Email" onChange={(e) => setEmail(e.target.value)} />
+      <main style={{ padding: 40, fontFamily: "sans-serif" }}>
+        <h1 style={{ marginBottom: 20 }}>Login</h1>
+
+        <input
+          placeholder="Email"
+          onChange={(e) => setEmail(e.target.value)}
+          style={inputStyle}
+        />
+
         <input
           placeholder="Password"
           type="password"
           onChange={(e) => setPassword(e.target.value)}
+          style={inputStyle}
         />
-        <button onClick={login}>Login / Sign Up</button>
+
+        <button onClick={login} style={primaryButton}>
+          Login / Sign Up
+        </button>
       </main>
     );
   }
@@ -141,32 +151,17 @@ export default function Dashboard() {
   const collectionRate = production ? (collections / production) * 100 : 0;
   const productionVsGoal = goal ? (production / goal) * 100 : 0;
 
-  const totalProduction = entries.reduce(
-    (sum, e) => sum + Number(e.production || 0),
-    0
-  );
-  const totalCollections = entries.reduce(
-    (sum, e) => sum + Number(e.collections || 0),
-    0
-  );
-
   const chartData = entries.map((e) => ({
     date: e.date,
     production: Number(e.production || 0),
     collections: Number(e.collections || 0),
   }));
 
-  const getColor = (value, good, ok) => {
-    if (value >= good) return "green";
-    if (value >= ok) return "orange";
-    return "red";
-  };
-
   const cardStyle = {
     background: "#fff",
     padding: 20,
-    borderRadius: 12,
-    boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
+    borderRadius: 16,
+    boxShadow: "0 10px 25px rgba(0,0,0,0.05)",
   };
 
   const navItem = {
@@ -176,86 +171,131 @@ export default function Dashboard() {
     textAlign: "left",
     padding: "10px 0",
     cursor: "pointer",
+    fontSize: 14,
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
+    <div style={{ display: "flex", minHeight: "100vh", fontFamily: "Inter, sans-serif" }}>
+      
       {/* SIDEBAR */}
-      <div
-        style={{
-          width: 220,
-          background: "#111827",
-          color: "white",
-          padding: 20,
-          display: "flex",
-          flexDirection: "column",
-        }}
-      >
+      <div style={{
+        width: 240,
+        background: "#0f172a",
+        color: "white",
+        padding: 24,
+        display: "flex",
+        flexDirection: "column"
+      }}>
         <h2 style={{ marginBottom: 30 }}>🦷 Dental SaaS</h2>
 
-        <button style={navItem}>Dashboard</button>
-        <button style={navItem}>Reports</button>
-        <button style={navItem}>Settings</button>
+        <button style={navItem}>🏠 Dashboard</button>
+        <button style={navItem}>📊 Reports</button>
+        <button style={navItem}>⚙️ Settings</button>
 
         <div style={{ marginTop: "auto", fontSize: 12, opacity: 0.6 }}>
           {user.email}
         </div>
       </div>
 
-      {/* MAIN CONTENT */}
-      <div
-        style={{
-          flex: 1,
-          padding: 30,
-          background: "#f5f7fb",
-        }}
-      >
-        <h1>SaaS Dental Dashboard</h1>
+      {/* MAIN */}
+      <div style={{
+        flex: 1,
+        padding: 30,
+        background: "#f8fafc"
+      }}>
+        <h1 style={{ fontSize: 28, marginBottom: 20 }}>Dashboard</h1>
 
-        <div style={cardStyle}>
-          <h3>Practice</h3>
+        {/* KPI CARDS */}
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))",
+          gap: 16,
+          marginBottom: 25
+        }}>
+          <div style={cardStyle}>
+            <p style={label}>Net Production</p>
+            <h2>${netProduction}</h2>
+          </div>
 
-          <select
-            value={practiceId}
-            onChange={(e) => setPracticeId(e.target.value)}
-          >
-            {practices.map((p, i) => (
-              <option key={i}>{p}</option>
-            ))}
-          </select>
+          <div style={cardStyle}>
+            <p style={label}>Collection Rate</p>
+            <h2>{collectionRate.toFixed(1)}%</h2>
+          </div>
 
-          <button
-            onClick={async () => {
-              const name = prompt("New practice name:");
-              if (name) {
-                const updated = [...practices, name];
-                setPractices(updated);
-                await savePractices(updated);
-              }
-            }}
-          >
-            + Add Practice
-          </button>
+          <div style={cardStyle}>
+            <p style={label}>Production Goal</p>
+            <h2>{productionVsGoal.toFixed(1)}%</h2>
+          </div>
         </div>
 
-        <div style={{ ...cardStyle, marginTop: 20 }}>
-          <h3>Production Trend</h3>
+        {/* PRACTICE */}
+        <div style={{ ...cardStyle, marginBottom: 20 }}>
+          <h3>Practice</h3>
 
-          <LineChart width={500} height={300} data={chartData}>
-            <CartesianGrid />
+          <div style={{ display: "flex", gap: 10, marginTop: 10 }}>
+            <select
+              value={practiceId}
+              onChange={(e) => setPracticeId(e.target.value)}
+              style={inputStyle}
+            >
+              {practices.map((p, i) => (
+                <option key={i}>{p}</option>
+              ))}
+            </select>
+
+            <button
+              onClick={async () => {
+                const name = prompt("New practice name:");
+                if (name) {
+                  const updated = [...practices, name];
+                  setPractices(updated);
+                  await savePractices(updated);
+                }
+              }}
+              style={primaryButton}
+            >
+              + Add
+            </button>
+          </div>
+        </div>
+
+        {/* CHART */}
+        <div style={cardStyle}>
+          <h3 style={{ marginBottom: 15 }}>Production Trend</h3>
+
+          <LineChart width={600} height={300} data={chartData}>
+            <CartesianGrid stroke="#eee" />
             <XAxis dataKey="date" />
             <YAxis />
             <Tooltip />
-            <Line dataKey="production" />
-            <Line dataKey="collections" />
+            <Line type="monotone" dataKey="production" stroke="#4f46e5" strokeWidth={3} />
+            <Line type="monotone" dataKey="collections" stroke="#10b981" strokeWidth={3} />
           </LineChart>
         </div>
-
-        <h2>KPIs</h2>
-        <p>Net Production: ${netProduction}</p>
-        <p>Collection Rate: {collectionRate.toFixed(1)}%</p>
-        <p>Production vs Goal: {productionVsGoal.toFixed(1)}%</p>
       </div>
     </div>
   );
 }
+
+// 🔹 Shared styles
+const inputStyle = {
+  padding: 10,
+  borderRadius: 8,
+  border: "1px solid #e5e7eb",
+  marginBottom: 10,
+  width: "100%",
+};
+
+const primaryButton = {
+  background: "#4f46e5",
+  color: "white",
+  border: "none",
+  padding: "10px 14px",
+  borderRadius: 8,
+  cursor: "pointer",
+};
+
+const label = {
+  fontSize: 12,
+  opacity: 0.6,
+};
