@@ -172,8 +172,9 @@ const navItem = {
   cursor: "pointer",
   fontSize: 14
 };
+
 return (
-<div style={{
+<<div style={{
   width: 220,
   background: "#111827",
   color: "white",
@@ -191,6 +192,7 @@ return (
     Logged in as<br />{user.email}
   </div>
 </div>
+    
 <div style={{
   flex: 1,
   padding: 30,
