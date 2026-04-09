@@ -186,6 +186,7 @@ return (
 </div>
   
 <h2 style={{ marginBottom: 30 }}>🦷 Dental SaaS</h2>
+};
 
 <button style={navItem}>Dashboard</button>
 <button style={navItem}>Reports</button>
