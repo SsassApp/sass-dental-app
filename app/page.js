@@ -173,7 +173,6 @@ const navItem = {
   fontSize: 14
 };
 return (
-  <div style={{ display: "flex", minHeight: "100vh"}}>
   <div style={{
   width: 220,
   background: "#111827",
@@ -182,17 +181,16 @@ return (
   display: "flex",
   flexDirection: "column"
 }}>
-</div>
-  
-<h2 style={{ marginBottom: 30 }}>🦷 Dental SaaS</h2>
+  <h2 style={{ marginBottom: 30 }}>🦷 Dental SaaS</h2>
 
-<button style={navItem}>Dashboard</button>
-<button style={navItem}>Reports</button>
-<button style={navItem}>Settings</button>
+  <button style={navItem}>Dashboard</button>
+  <button style={navItem}>Reports</button>
+  <button style={navItem}>Settings</button>
 
   <div style={{ marginTop: "auto", fontSize: 12, opacity: 0.6 }}>
-    Logged in as<br />{user.email}</div>
+    Logged in as<br />{user.email}
   </div>
+</div>
 <div style={{
   flex: 1,
   padding: 30,
