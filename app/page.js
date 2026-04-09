@@ -162,8 +162,7 @@ const cardStyle = {
   padding: 20,
   borderRadius: 12,
   boxShadow: "0 4px 12px rgba(0,0,0,0.05)"
-};
-
+    
 const navItem = {
   background: "transparent",
   border: "none",
@@ -186,7 +185,6 @@ return (
 </div>
   
 <h2 style={{ marginBottom: 30 }}>🦷 Dental SaaS</h2>
-};
 
 <button style={navItem}>Dashboard</button>
 <button style={navItem}>Reports</button>
