@@ -173,7 +173,7 @@ const navItem = {
   fontSize: 14
 };
 return (
-  <div style={{
+<div style={{
   width: 220,
   background: "#111827",
   color: "white",
