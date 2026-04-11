@@ -20,6 +20,8 @@ export default function Dashboard() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const [range, setRange] = useState("day");
+
   const [data, setData] = useState({
     production: "",
     collections: "",
@@ -38,7 +40,13 @@ export default function Dashboard() {
   const [practiceId, setPracticeId] = useState("default");
   const [practices, setPractices] = useState(["default"]);
 
-  // ---------- AUTH ----------
+  // ---------- AUTO DATE ----------
+  useEffect(() => {
+    const today = new Date().toISOString().split("T")[0];
+    setDate(today);
+  }, []);
+
+  // ---------- LOGIN ----------
   const login = async () => {
     try {
       const res = await signInWithEmailAndPassword(auth, email, password);
@@ -49,15 +57,14 @@ export default function Dashboard() {
     }
   };
 
-  // ---------- HANDLER ----------
   const handle = (field, value) => {
     setData({ ...data, [field]: value });
   };
 
-  // ---------- SAVE DATA ----------
+  // ---------- SAVE ----------
   const saveData = async () => {
     if (!date) {
-      alert("Please select a date");
+      alert("Select a date");
       return;
     }
 
@@ -73,19 +80,19 @@ export default function Dashboard() {
     loadData();
   };
 
-  // ---------- LOAD DATA ----------
+  // ---------- LOAD ----------
   const loadData = async () => {
     const querySnapshot = await getDocs(collection(db, "entries"));
     const list = [];
 
     querySnapshot.forEach((doc) => {
-      const entry = doc.data();
+      const e = doc.data();
 
       if (
-        entry.practiceId === practiceId &&
-        entry.user === user.email
+        e.practiceId === practiceId &&
+        e.user === user.email
       ) {
-        list.push(entry);
+        list.push(e);
       }
     });
 
@@ -125,22 +132,41 @@ export default function Dashboard() {
         <h1>Login</h1>
         <input placeholder="Email" onChange={(e) => setEmail(e.target.value)} style={inputStyle}/>
         <input placeholder="Password" type="password" onChange={(e) => setPassword(e.target.value)} style={inputStyle}/>
-        <button onClick={login} style={primaryButton}>Login</button>
+        <button onClick={login} style={btn}>Login</button>
       </main>
     );
   }
 
-  // ---------- TOTALS ----------
-  const totalProduction = entries.reduce((s, e) => s + Number(e.production || 0), 0);
-  const totalCollections = entries.reduce((s, e) => s + Number(e.collections || 0), 0);
-  const totalNewPatients = entries.reduce((s, e) => s + Number(e.newPatients || 0), 0);
-  const totalReferrals = entries.reduce((s, e) => s + Number(e.referrals || 0), 0);
-  const totalProviderProduction = entries.reduce((s, e) => s + Number(e.providerProduction || 0), 0);
-  const totalClaims30 = entries.reduce((s, e) => s + Number(e.claims30 || 0), 0);
-  const totalClaims60 = entries.reduce((s, e) => s + Number(e.claims60 || 0), 0);
-  const totalClaims90 = entries.reduce((s, e) => s + Number(e.claims90 || 0), 0);
+  // ---------- FILTER (REPORTING MAGIC) ----------
+  const now = new Date();
 
-  const chartData = entries.map((e) => ({
+  const filtered = entries.filter((e) => {
+    const d = new Date(e.date);
+
+    if (range === "day") {
+      return d.toDateString() === now.toDateString();
+    }
+
+    if (range === "week") {
+      const weekAgo = new Date();
+      weekAgo.setDate(now.getDate() - 7);
+      return d >= weekAgo;
+    }
+
+    if (range === "month") {
+      const monthAgo = new Date();
+      monthAgo.setMonth(now.getMonth() - 1);
+      return d >= monthAgo;
+    }
+
+    return true;
+  });
+
+  // ---------- TOTALS ----------
+  const sum = (field) =>
+    filtered.reduce((s, e) => s + Number(e[field] || 0), 0);
+
+  const chartData = filtered.map((e) => ({
     date: e.date,
     production: Number(e.production || 0),
     collections: Number(e.collections || 0),
@@ -163,7 +189,7 @@ export default function Dashboard() {
           setPractices(updated);
           await savePractices(updated);
         }
-      }} style={primaryButton}>
+      }} style={btn}>
         + Practice
       </button>
 
@@ -190,19 +216,26 @@ export default function Dashboard() {
         <input placeholder="60 Days" onChange={(e) => handle("claims60", e.target.value)} style={inputStyle}/>
         <input placeholder="90 Days" onChange={(e) => handle("claims90", e.target.value)} style={inputStyle}/>
 
-        <button onClick={saveData} style={primaryButton}>Save Entry</button>
+        <button onClick={saveData} style={btn}>Save Entry</button>
       </div>
 
-      {/* KPI */}
+      {/* RANGE TOGGLE */}
+      <div style={{ marginTop: 20 }}>
+        <button onClick={() => setRange("day")} style={rangeBtn(range === "day")}>Day</button>
+        <button onClick={() => setRange("week")} style={rangeBtn(range === "week")}>Week</button>
+        <button onClick={() => setRange("month")} style={rangeBtn(range === "month")}>Month</button>
+      </div>
+
+      {/* KPI GRID */}
       <div style={grid}>
-        <Card title="Production" value={`$${totalProduction}`} />
-        <Card title="Collections" value={`$${totalCollections}`} />
-        <Card title="New Patients" value={totalNewPatients} />
-        <Card title="Referrals" value={totalReferrals} />
-        <Card title="Provider Production" value={`$${totalProviderProduction}`} />
-        <Card title="Claims 30" value={`$${totalClaims30}`} />
-        <Card title="Claims 60" value={`$${totalClaims60}`} />
-        <Card title="Claims 90" value={`$${totalClaims90}`} />
+        <Card title="Production" value={`$${sum("production")}`} />
+        <Card title="Collections" value={`$${sum("collections")}`} />
+        <Card title="New Patients" value={sum("newPatients")} />
+        <Card title="Referrals" value={sum("referrals")} />
+        <Card title="Provider Production" value={`$${sum("providerProduction")}`} />
+        <Card title="Claims 30" value={`$${sum("claims30")}`} />
+        <Card title="Claims 60" value={`$${sum("claims60")}`} />
+        <Card title="Claims 90" value={`$${sum("claims90")}`} />
       </div>
 
       {/* CHART */}
@@ -235,7 +268,7 @@ const inputStyle = {
   width: "100%",
 };
 
-const primaryButton = {
+const btn = {
   padding: 10,
   background: "#4f46e5",
   color: "white",
@@ -255,3 +288,13 @@ const grid = {
   gap: 10,
   marginTop: 20,
 };
+
+const rangeBtn = (active) => ({
+  padding: "6px 10px",
+  marginRight: 5,
+  borderRadius: 6,
+  border: "none",
+  cursor: "pointer",
+  background: active ? "#4f46e5" : "#e5e7eb",
+  color: active ? "white" : "black",
+});
