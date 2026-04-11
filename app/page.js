@@ -204,6 +204,41 @@ export default function Dashboard() {
           </button>
         </div>
 
+<div style={{ marginTop: 20, ...cardStyle(theme) }}>
+  <h3 style={{ marginBottom: 10 }}>Daily Entry</h3>
+
+  <input
+    type="date"
+    value={date}
+    onChange={(e) => setDate(e.target.value)}
+    style={inputStyle}
+  />
+
+  <input
+    placeholder="Production"
+    value={data.production}
+    onChange={(e) => setData({ ...data, production: e.target.value })}
+    style={inputStyle}
+  />
+
+  <input
+    placeholder="Collections"
+    value={data.collections}
+    onChange={(e) => setData({ ...data, collections: e.target.value })}
+    style={inputStyle}
+  />
+
+  <input
+    placeholder="Adjustments"
+    value={data.adjustments}
+    onChange={(e) => setData({ ...data, adjustments: e.target.value })}
+    style={inputStyle}
+  />
+
+  <button onClick={saveData} style={primaryButton}>
+    💾 Save Entry
+  </button>
+</div>
         {/* KPI */}
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px,1fr))", gap: 15 }}>
           <div style={{ ...cardStyle(theme) }}>
