@@ -298,3 +298,12 @@ const rangeBtn = (active) => ({
   background: active ? "#4f46e5" : "#e5e7eb",
   color: active ? "white" : "black",
 });
+const rangeBtn = (active) => ({
+  padding: "6px 10px",
+  marginRight: 5,
+  borderRadius: 6,
+  border: "none",
+  cursor: "pointer",
+  background: active ? "#4f46e5" : "#e5e7eb",
+  color: active ? "white" : "black",
+});
