@@ -20,13 +20,16 @@ export default function Dashboard() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const [darkMode, setDarkMode] = useState(false);
-  const [range, setRange] = useState("week");
-
   const [data, setData] = useState({
     production: "",
     collections: "",
     adjustments: "",
+    newPatients: "",
+    referrals: "",
+    providerProduction: "",
+    claims30: "",
+    claims60: "",
+    claims90: "",
   });
 
   const [entries, setEntries] = useState([]);
@@ -35,11 +38,7 @@ export default function Dashboard() {
   const [practiceId, setPracticeId] = useState("default");
   const [practices, setPractices] = useState(["default"]);
 
-  const [goals, setGoals] = useState({
-    production: 12000,
-  });
-
-  // LOGIN
+  // ---------- AUTH ----------
   const login = async () => {
     try {
       const res = await signInWithEmailAndPassword(auth, email, password);
@@ -50,15 +49,12 @@ export default function Dashboard() {
     }
   };
 
-  // SAVE PRACTICES
-  const savePractices = async (newList) => {
-    await setDoc(doc(db, "practices", user.email), {
-      user: user.email,
-      list: newList,
-    });
+  // ---------- HANDLER ----------
+  const handle = (field, value) => {
+    setData({ ...data, [field]: value });
   };
 
-  // SAVE DATA
+  // ---------- SAVE DATA ----------
   const saveData = async () => {
     if (!date) {
       alert("Please select a date");
@@ -67,7 +63,6 @@ export default function Dashboard() {
 
     await addDoc(collection(db, "entries"), {
       ...data,
-      goals,
       practiceId,
       date,
       createdAt: new Date(),
@@ -75,11 +70,10 @@ export default function Dashboard() {
     });
 
     alert("Saved!");
-
-    loadData(); // 🔥 refresh immediately
+    loadData();
   };
 
-  // LOAD DATA
+  // ---------- LOAD DATA ----------
   const loadData = async () => {
     const querySnapshot = await getDocs(collection(db, "entries"));
     const list = [];
@@ -87,7 +81,6 @@ export default function Dashboard() {
     querySnapshot.forEach((doc) => {
       const entry = doc.data();
 
-      // ✅ FIXED FILTER
       if (
         entry.practiceId === practiceId &&
         entry.user === user.email
@@ -97,14 +90,18 @@ export default function Dashboard() {
     });
 
     setEntries(list);
-
-    console.log("Loaded entries:", list); // debug
   };
 
-  // LOAD PRACTICES
+  // ---------- PRACTICES ----------
+  const savePractices = async (newList) => {
+    await setDoc(doc(db, "practices", user.email), {
+      user: user.email,
+      list: newList,
+    });
+  };
+
   const loadPractices = async () => {
     const querySnapshot = await getDocs(collection(db, "practices"));
-
     querySnapshot.forEach((docSnap) => {
       const data = docSnap.data();
       if (data.user === user.email) {
@@ -121,236 +118,140 @@ export default function Dashboard() {
     if (user) loadData();
   }, [practiceId, user]);
 
-  // LOGIN SCREEN
+  // ---------- LOGIN SCREEN ----------
   if (!user) {
     return (
       <main style={{ padding: 40 }}>
         <h1>Login</h1>
-
-        <input
-          placeholder="Email"
-          onChange={(e) => setEmail(e.target.value)}
-          style={inputStyle}
-        />
-
-        <input
-          placeholder="Password"
-          type="password"
-          onChange={(e) => setPassword(e.target.value)}
-          style={inputStyle}
-        />
-
-        <button onClick={login} style={primaryButton}>
-          Login
-        </button>
+        <input placeholder="Email" onChange={(e) => setEmail(e.target.value)} style={inputStyle}/>
+        <input placeholder="Password" type="password" onChange={(e) => setPassword(e.target.value)} style={inputStyle}/>
+        <button onClick={login} style={primaryButton}>Login</button>
       </main>
     );
   }
 
-  // FILTER DATA
-  const filterEntries = () => {
-    const now = new Date();
+  // ---------- TOTALS ----------
+  const totalProduction = entries.reduce((s, e) => s + Number(e.production || 0), 0);
+  const totalCollections = entries.reduce((s, e) => s + Number(e.collections || 0), 0);
+  const totalNewPatients = entries.reduce((s, e) => s + Number(e.newPatients || 0), 0);
+  const totalReferrals = entries.reduce((s, e) => s + Number(e.referrals || 0), 0);
+  const totalProviderProduction = entries.reduce((s, e) => s + Number(e.providerProduction || 0), 0);
+  const totalClaims30 = entries.reduce((s, e) => s + Number(e.claims30 || 0), 0);
+  const totalClaims60 = entries.reduce((s, e) => s + Number(e.claims60 || 0), 0);
+  const totalClaims90 = entries.reduce((s, e) => s + Number(e.claims90 || 0), 0);
 
-    return entries.filter((e) => {
-      const d = new Date(e.date);
-
-      if (range === "week") {
-        const weekAgo = new Date();
-        weekAgo.setDate(now.getDate() - 7);
-        return d >= weekAgo;
-      }
-
-      if (range === "month") {
-        const monthAgo = new Date();
-        monthAgo.setMonth(now.getMonth() - 1);
-        return d >= monthAgo;
-      }
-
-      return true;
-    });
-  };
-
-  const filtered = filterEntries();
-
-  const totalProduction = filtered.reduce(
-    (sum, e) => sum + Number(e.production || 0),
-    0
-  );
-
-  const totalCollections = filtered.reduce(
-    (sum, e) => sum + Number(e.collections || 0),
-    0
-  );
-
-  const forecast = Math.round(
-    (totalProduction / (filtered.length || 1)) * 30
-  );
-
-  const chartData = filtered.map((e) => ({
+  const chartData = entries.map((e) => ({
     date: e.date,
     production: Number(e.production || 0),
     collections: Number(e.collections || 0),
   }));
 
-  const theme = darkMode
-    ? { bg: "#0f172a", card: "#1e293b", text: "white" }
-    : { bg: "#f8fafc", card: "#fff", text: "#000" };
-
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: theme.bg, color: theme.text }}>
+    <div style={{ padding: 30 }}>
 
-      {/* SIDEBAR */}
-      <div style={{ width: 240, padding: 20, background: "#111827", color: "white" }}>
-        <h2>🦷 Dental SaaS</h2>
+      <h1>Dental Dashboard</h1>
 
-        <select
-          value={practiceId}
-          onChange={(e) => setPracticeId(e.target.value)}
-          style={inputStyle}
-        >
-          {practices.map((p, i) => (
-            <option key={i}>{p}</option>
-          ))}
-        </select>
+      {/* PRACTICE */}
+      <select value={practiceId} onChange={(e) => setPracticeId(e.target.value)} style={inputStyle}>
+        {practices.map((p, i) => <option key={i}>{p}</option>)}
+      </select>
 
-        <button
-          onClick={async () => {
-            const name = prompt("New practice:");
-            if (name) {
-              const updated = [...practices, name];
-              setPractices(updated);
-              await savePractices(updated);
-            }
-          }}
-          style={primaryButton}
-        >
-          + Practice
-        </button>
+      <button onClick={async () => {
+        const name = prompt("New practice:");
+        if (name) {
+          const updated = [...practices, name];
+          setPractices(updated);
+          await savePractices(updated);
+        }
+      }} style={primaryButton}>
+        + Practice
+      </button>
 
-        <button onClick={() => setDarkMode(!darkMode)} style={{ marginTop: 10 }}>
-          🌙 Toggle
-        </button>
+      {/* ENTRY */}
+      <div style={card}>
+        <h3>Daily Entry</h3>
 
-        <div style={{ marginTop: "auto", fontSize: 12 }}>
-          {user.email}
-        </div>
+        <input type="date" value={date} onChange={(e) => setDate(e.target.value)} style={inputStyle} />
+
+        <h4>Financial</h4>
+        <input placeholder="Production" onChange={(e) => handle("production", e.target.value)} style={inputStyle}/>
+        <input placeholder="Collections" onChange={(e) => handle("collections", e.target.value)} style={inputStyle}/>
+        <input placeholder="Adjustments" onChange={(e) => handle("adjustments", e.target.value)} style={inputStyle}/>
+
+        <h4>Growth</h4>
+        <input placeholder="New Patients" onChange={(e) => handle("newPatients", e.target.value)} style={inputStyle}/>
+        <input placeholder="Referrals" onChange={(e) => handle("referrals", e.target.value)} style={inputStyle}/>
+
+        <h4>Providers</h4>
+        <input placeholder="Provider Production" onChange={(e) => handle("providerProduction", e.target.value)} style={inputStyle}/>
+
+        <h4>Claims</h4>
+        <input placeholder="30 Days" onChange={(e) => handle("claims30", e.target.value)} style={inputStyle}/>
+        <input placeholder="60 Days" onChange={(e) => handle("claims60", e.target.value)} style={inputStyle}/>
+        <input placeholder="90 Days" onChange={(e) => handle("claims90", e.target.value)} style={inputStyle}/>
+
+        <button onClick={saveData} style={primaryButton}>Save Entry</button>
       </div>
 
-      {/* MAIN */}
-      <div style={{ flex: 1, padding: 30 }}>
-
-        <h1>Dashboard</h1>
-
-        {/* ENTRY FORM */}
-        <div style={cardStyle(theme)}>
-          <h3>Daily Entry</h3>
-
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            style={inputStyle}
-          />
-
-          <input
-            placeholder="Production"
-            value={data.production}
-            onChange={(e) => setData({ ...data, production: e.target.value })}
-            style={inputStyle}
-          />
-
-          <input
-            placeholder="Collections"
-            value={data.collections}
-            onChange={(e) => setData({ ...data, collections: e.target.value })}
-            style={inputStyle}
-          />
-
-          <input
-            placeholder="Adjustments"
-            value={data.adjustments}
-            onChange={(e) => setData({ ...data, adjustments: e.target.value })}
-            style={inputStyle}
-          />
-
-          <button onClick={saveData} style={primaryButton}>
-            💾 Save Entry
-          </button>
-        </div>
-
-        {/* RANGE */}
-        <div style={{ marginTop: 20 }}>
-          <button onClick={() => setRange("day")} style={rangeBtn(range === "day")}>Day</button>
-          <button onClick={() => setRange("week")} style={rangeBtn(range === "week")}>Week</button>
-          <button onClick={() => setRange("month")} style={rangeBtn(range === "month")}>Month</button>
-        </div>
-
-        {/* KPI */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px,1fr))", gap: 15, marginTop: 20 }}>
-          <div style={cardStyle(theme)}>
-            <p>Production</p>
-            <h2>${totalProduction}</h2>
-          </div>
-
-          <div style={cardStyle(theme)}>
-            <p>Collections</p>
-            <h2>${totalCollections}</h2>
-          </div>
-
-          <div style={cardStyle(theme)}>
-            <p>Forecast</p>
-            <h2>${forecast}</h2>
-          </div>
-        </div>
-
-        {/* CHART */}
-        <div style={{ marginTop: 20, ...cardStyle(theme) }}>
-          <LineChart width={700} height={300} data={chartData}>
-            <CartesianGrid />
-            <XAxis dataKey="date" />
-            <YAxis />
-            <Tooltip />
-            <Line dataKey="production" stroke="#4f46e5" />
-            <Line dataKey="collections" stroke="#10b981" />
-          </LineChart>
-        </div>
-
+      {/* KPI */}
+      <div style={grid}>
+        <Card title="Production" value={`$${totalProduction}`} />
+        <Card title="Collections" value={`$${totalCollections}`} />
+        <Card title="New Patients" value={totalNewPatients} />
+        <Card title="Referrals" value={totalReferrals} />
+        <Card title="Provider Production" value={`$${totalProviderProduction}`} />
+        <Card title="Claims 30" value={`$${totalClaims30}`} />
+        <Card title="Claims 60" value={`$${totalClaims60}`} />
+        <Card title="Claims 90" value={`$${totalClaims90}`} />
       </div>
+
+      {/* CHART */}
+      <div style={card}>
+        <LineChart width={700} height={300} data={chartData}>
+          <CartesianGrid />
+          <XAxis dataKey="date" />
+          <YAxis />
+          <Tooltip />
+          <Line dataKey="production" stroke="#4f46e5" />
+          <Line dataKey="collections" stroke="#10b981" />
+        </LineChart>
+      </div>
+
     </div>
   );
 }
 
-/* STYLES */
+// ---------- UI ----------
+const Card = ({ title, value }) => (
+  <div style={card}>
+    <p>{title}</p>
+    <h2>{value}</h2>
+  </div>
+);
+
 const inputStyle = {
   padding: 8,
-  borderRadius: 6,
-  border: "1px solid #ccc",
   marginBottom: 8,
   width: "100%",
 };
 
 const primaryButton = {
+  padding: 10,
   background: "#4f46e5",
   color: "white",
-  padding: 8,
   border: "none",
-  borderRadius: 6,
-  cursor: "pointer",
-  width: "100%",
+  marginBottom: 10,
 };
 
-const rangeBtn = (active) => ({
-  padding: "6px 10px",
-  marginRight: 5,
-  borderRadius: 6,
-  border: "none",
-  cursor: "pointer",
-  background: active ? "#4f46e5" : "#e5e7eb",
-  color: active ? "white" : "black",
-});
-
-const cardStyle = (theme) => ({
-  background: theme.card,
+const card = {
   padding: 20,
-  borderRadius: 12,
-});
+  border: "1px solid #ddd",
+  marginTop: 20,
+};
+
+const grid = {
+  display: "grid",
+  gridTemplateColumns: "repeat(auto-fit, minmax(150px,1fr))",
+  gap: 10,
+  marginTop: 20,
+};
